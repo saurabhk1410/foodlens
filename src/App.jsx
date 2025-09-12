@@ -57,246 +57,356 @@ const FoodLensLanding = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 text-slate-800">
-      {/* Navigation */}
-      <nav className={`fixed w-full z-50 transition-all duration-300 ${scrollPosition > 50 ? 'bg-white/90 backdrop-blur-md shadow-sm' : 'bg-transparent'}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-24  ">
-            <div className="flex items-center ">
-              <div className=" flex items-center space-x-1">
-                <img src="https://i.postimg.cc/nLprcQxw/image-1-removebg-preview.png" className='w-16 ' alt="" />
-                <span className="text-2xl font-bold text-emerald-600">Food
-                  <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-amber-600">Lens
-                  </span>
+  {/* Navigation */}
+<nav
+  className={`fixed w-full z-50 transition-all duration-300 ${
+    scrollPosition > 50
+      ? 'bg-white/90 backdrop-blur-md shadow-sm'
+      : 'bg-transparent'
+  }`}
+>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="flex justify-between items-center h-24">
+      
+      {/* Left: Logo */}
+      <div className="flex items-center space-x-1">
+        <img
+          src="https://i.postimg.cc/nLprcQxw/image-1-removebg-preview.png"
+          className="w-16"
+          alt="logo"
+        />
+        <span className="text-2xl font-bold text-emerald-600">
+          Food
+          <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-amber-600">
+            Lens
+          </span>
+        </span>
+      </div>
+
+      {/* Center: Search Bar */}
+      <div className="hidden md:flex flex-1 justify-center px-6">
+        <div className="w-full max-w-xl bg-white rounded-2xl shadow-md p-2 flex items-center">
+          <div className="flex-1 flex items-center px-3">
+            <Search size={20} className="text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search for dishes, places, or experiences..."
+              className="w-full py-3 px-2 text-slate-700 placeholder-slate-400 outline-none bg-transparent"
+            />
+          </div>
+          <button className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-medium py-2 px-5 rounded-xl transition-all flex items-center">
+            Search <ChevronRight size={20} className="ml-1" />
+          </button>
+        </div>
+      </div>
+
+      {/* Right: Auth buttons + Mobile Menu */}
+      <div className="flex items-center space-x-4">
+        {/* Desktop Auth */}
+        <div className="hidden md:flex items-center space-x-4">
+          <a
+            href="/login"
+            className="text-slate-700 hover:text-orange-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+          >
+            Login
+          </a>
+          <a
+            href="/signup"
+            className="px-4 py-2 rounded-md text-sm font-medium text-white bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 transition-all shadow-md hover:shadow-lg"
+          >
+            Sign Up
+          </a>
+        </div>
+
+        {/* Mobile Menu Button */}
+        <div className="md:hidden">
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="inline-flex items-center justify-center p-2 rounded-md text-slate-700 hover:text-orange-600 focus:outline-none"
+          >
+            <span className="sr-only">Open main menu</span>
+            {!isMenuOpen ? (
+              <svg
+                className="block h-6 w-6"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            ) : (
+              <svg
+                className="block h-6 w-6"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Mobile Menu */}
+  {isMenuOpen && (
+    <div className="md:hidden bg-white/95 backdrop-blur-md rounded-b-2xl shadow-xl">
+      <div className="pt-2 pb-3 space-y-1">
+        <a
+          href="/discover"
+          className="block pl-3 pr-4 py-2 border-l-4 border-orange-500 text-base font-medium text-orange-600 bg-orange-50"
+        >
+          Discover
+        </a>
+        <a
+          href="/trending"
+          className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+        >
+          Trending
+        </a>
+        <a
+          href="/categories"
+          className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+        >
+          Categories
+        </a>
+        <a
+          href="/addplace"
+          className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+        >
+          Add Place
+        </a>
+        <div className="pt-4 pb-3 border-t border-slate-200">
+          <div className="flex items-center px-5">
+            <a
+              href="/login"
+              className="block px-4 py-2 rounded-md text-base font-medium text-slate-600 hover:text-slate-900"
+            >
+              Login
+            </a>
+            <a
+              href="/signup"
+              className="ml-3 px-4 py-2 rounded-md text-base font-medium text-white bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700"
+            >
+              Sign Up
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+</nav>
+
+
+{/* Hero Section */}
+{/* Hero Section */}
+<div className="relative pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden">
+  {/* Background Blobs */}
+  <div className="absolute inset-0 overflow-hidden">
+    <div className="absolute left-1/4 top-0 w-96 h-96 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+    <div className="absolute left-1/2 top-20 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+    <div className="absolute left-1/3 top-40 w-96 h-96 bg-amber-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+  </div>
+
+  <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+   
+
+    {/* Two Column Layout */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+      
+      {/* Left: Video */}
+      <div className="flex justify-center">
+        <video
+          src="https://www.pexels.com/download/video/7148257/"
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="h-full w-full max-w-lg object-cover rounded-3xl shadow-xl"
+        />
+      </div>
+
+      {/* Right: Content */}
+      <div className="text-center md:text-left">
+        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
+          <span className="block">Discover India's</span>
+          <span className="block bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-amber-600 py-2">
+            Hidden Food Gems
+          </span>
+        </h1>
+        <p className="mt-4 max-w-2xl mx-auto md:mx-0 text-xl text-slate-600 md:mt-6">
+          AI-powered food discovery that goes beyond restaurants. Find the best dishes, local experiences, and authentic flavors across India.
+        </p>
+
+        {/* Buttons */}
+        <div className="mt-8 flex flex-col sm:flex-row justify-center md:justify-start items-center space-y-4 sm:space-y-0 sm:space-x-4">
+          <a
+            href="/discover"
+            className="px-6 py-3 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 text-white font-medium shadow-md hover:shadow-lg transition-all flex items-center"
+          >
+            Explore Food <ChevronRight size={20} className="ml-1" />
+          </a>
+          <a
+            href="/howitworks"
+            className="px-6 py-3 rounded-xl bg-white text-slate-700 font-medium shadow-md hover:shadow-lg transition-all flex items-center border border-slate-200"
+          >
+            How It Works
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+     {/* Trending Dishes */}
+{/* Trending Dishes */}
+<div className="py-12 bg-white">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="text-center">
+      <h2 className="text-base font-semibold text-orange-600 tracking-wide uppercase">
+        Trending Now
+      </h2>
+      <p className="mt-2 text-3xl font-extrabold text-slate-900 sm:text-4xl">
+        What's hot in your city
+      </p>
+    </div>
+
+    <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      {trendingDishes.map((dish, index) => (
+        <div
+          key={index}
+          className="relative group rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+        >
+          {/* Dish Image */}
+          <img
+            src={dish.link}
+            alt={dish.name}
+            className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-105"
+            onError={(e) => {
+              e.target.src =
+                'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiM5YzlkYWEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
+            }}
+          />
+
+          {/* Price Badge */}
+          <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full shadow-sm text-xs font-semibold text-slate-900">
+            {dish.price}
+          </div>
+
+          {/* Bottom Overlay Info */}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-4">
+            <h3 className="text-white text-lg font-bold truncate">{dish.name}</h3>
+            <p className="text-white/80 text-sm flex items-center truncate">
+              <MapPin size={14} className="mr-1 flex-shrink-0" />
+              {dish.place}
+            </p>
+
+            <div className="mt-2 flex items-center justify-between">
+              {/* Rating */}
+              <div className="flex items-center">
+                <div className="flex text-amber-400">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      size={14}
+                      className={i < Math.floor(dish.rating) ? "fill-current" : "text-slate-600"}
+                    />
+                  ))}
+                </div>
+                <span className="ml-1 text-xs font-medium text-white">
+                  {dish.rating.toFixed(1)}
                 </span>
               </div>
-              <div className="hidden md:ml-6 md:flex md:space-x-8">
-                <a href="/discover" className="text-slate-700 hover:text-orange-600 inline-flex items-center px-1 pt-1 text-sm font-medium transition-colors">
-                  Discover
-                </a>
-                <a href="/trending" className="text-slate-700 hover:text-orange-600 inline-flex items-center px-1 pt-1 text-sm font-medium transition-colors">
-                  Trending
-                </a>
-                <a href="/categories" className="text-slate-700 hover:text-orange-600 inline-flex items-center px-1 pt-1 text-sm font-medium transition-colors">
-                  Categories
-                </a>
-                <a href="/addplace" className="text-slate-700 hover:text-orange-600 inline-flex items-center px-1 pt-1 text-sm font-medium transition-colors">
-                  Add Place
-                </a>
-              </div>
-            </div>
-            <div className="hidden md:flex items-center space-x-4">
-              <a href="/login" className="text-slate-700 hover:text-orange-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                Login
-              </a>
-              <a href="/signup" className="px-4 py-2 rounded-md text-sm font-medium text-white bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 transition-all shadow-md hover:shadow-lg">
-                Sign Up
-              </a>
-            </div>
-            <div className="flex items-center md:hidden">
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="inline-flex items-center justify-center p-2 rounded-md text-slate-700 hover:text-orange-600 focus:outline-none"
-              >
-                <span className="sr-only">Open main menu</span>
-                {!isMenuOpen ? (
-                  <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                ) : (
-                  <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile menu */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white/95 backdrop-blur-md rounded-b-2xl shadow-xl">
-            <div className="pt-2 pb-3 space-y-1">
-              <a href="/discover" className="block pl-3 pr-4 py-2 border-l-4 border-orange-500 text-base font-medium text-orange-600 bg-orange-50">
-                Discover
-              </a>
-              <a href="/trending" className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
-                Trending
-              </a>
-              <a href="/categories" className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
-                Categories
-              </a>
-              <a href="/addplace" className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">
-                Add Place
-              </a>
-              <div className="pt-4 pb-3 border-t border-slate-200">
-                <div className="flex items-center px-5">
-                  <a href="/login" className="block px-4 py-2 rounded-md text-base font-medium text-slate-600 hover:text-slate-900">
-                    Login
-                  </a>
-                  <a href="/signup" className="ml-3 px-4 py-2 rounded-md text-base font-medium text-white bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700">
-                    Sign Up
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </nav>
-
-      {/* Hero Section */}
-      <div className="relative pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden ">
-        {/* <video
-              src="https://www.pexels.com/download/video/1560989/"
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="w-160 object-cover rounded-3xl shadow-xl"
-            /> */}
-        <img src="" className='absolute top-0' alt="" />
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute left-1/4 top-0 w-96 h-96 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-          <div className="absolute left-1/2 top-20 w-96 h-96 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-          <div className="absolute left-1/3 top-40 w-96 h-96 bg-amber-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
-
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
-              <span className="block">Discover India's</span>
-              <span className="block bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-amber-600 py-2">
-                Hidden Food Gems
+              <span className="text-[11px] text-white/70">
+                {dish.reviews} reviews
               </span>
-            </h1>
-            <p className="mt-4 max-w-2xl mx-auto text-xl text-slate-600 md:mt-6">
-              AI-powered food discovery that goes beyond restaurants. Find the best dishes, local experiences, and authentic flavors across India.
-            </p>
-
-            {/* Search Bar */}
-            <div className="mt-8 max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-2 flex items-center">
-              <div className="flex-1 flex items-center px-4">
-                <Search size={20} className="text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Search for dishes, places, or experiences..."
-                  className="w-full py-4 px-3 text-slate-700 placeholder-slate-400 outline-none bg-transparent"
-                />
-              </div>
-              <button className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white font-medium py-3 px-6 rounded-xl transition-all flex items-center">
-                Search <ChevronRight size={20} className="ml-1" />
-              </button>
-            </div>
-
-            <div className="mt-8 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
-              <a
-                href="/discover"
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 text-white font-medium shadow-md hover:shadow-lg transition-all flex items-center"
-              >
-                Explore Food <ChevronRight size={20} className="ml-1" />
-              </a>
-              <a
-                href="/howitworks"
-                className="px-6 py-3 rounded-xl bg-white text-slate-700 font-medium shadow-md hover:shadow-lg transition-all flex items-center border border-slate-200"
-              >
-                How It Works
-              </a>
             </div>
           </div>
         </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+{/* Features Section */}
+<div className="relative py-24 bg-gradient-to-br from-slate-50 via-white to-orange-50/30 overflow-hidden">
+  {/* Background decorative elements */}
+  <div className="absolute left-1/4 top-1/4 -translate-y-1/2 w-96 h-96 bg-orange-200/20 rounded-full blur-3xl -z-10" />
+  <div className="absolute right-1/4 bottom-1/4 translate-y-1/2 w-96 h-96 bg-amber-200/20 rounded-full blur-3xl -z-10" />
+  
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+    {/* Section Heading */}
+    <div className="text-center mb-20">
+      <div className="inline-flex items-center rounded-full bg-orange-100 px-4 py-2 text-xs font-medium text-orange-700 ring-1 ring-inset ring-orange-600/20 mb-5">
+        AI-Powered Innovation
       </div>
+      <h2 className="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
+        Smarter Food Discovery
+      </h2>
+    </div>
 
-      {/* Trending Dishes */}
-      <div className="py-12 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-base font-semibold text-orange-600 tracking-wide uppercase">Trending Now</h2>
-            <p className="mt-2 text-3xl font-extrabold text-slate-900 sm:text-4xl">
-              What's hot in your city
-            </p>
-          </div>
-
-          <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            {trendingDishes.map((dish, index) => (
-              <div key={index} className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group">
-                <div className="relative h-56 overflow-hidden">
-                  <img
-                    src={dish.link}
-                    alt={dish.name}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    onError={(e) => {
-                      e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJtb25vc3BhY2UiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiM5YzlkYWEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
-                    }}
-                  />
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-sm">
-                    <span className="font-bold text-slate-900 text-sm">{dish.price}</span>
-                  </div>
-                </div>
-
-                <div className="p-5">
-                  <h3 className="text-lg font-bold text-slate-900 mb-1 truncate">{dish.name}</h3>
-                  <p className="text-slate-600 text-sm flex items-center mb-3">
-                    <MapPin size={12} className="mr-1 flex-shrink-0" />
-                    <span className="truncate">{dish.place}</span>
-                  </p>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="flex text-amber-500">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            size={14}
-                            className={i < Math.floor(dish.rating) ? "fill-current" : "text-amber-200"}
-                          />
-                        ))}
-                      </div>
-                      <span className="ml-1 text-sm font-medium text-slate-900">{dish.rating.toFixed(1)}</span>
-                    </div>
-                    <span className="text-xs text-slate-500">{dish.reviews} reviews</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Features Section */}
-      <div className="py-16 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-base font-semibold text-orange-600 tracking-wide uppercase">AI-Powered Features</h2>
-            <p className="mt-2 text-3xl font-extrabold text-slate-900 sm:text-4xl">
-              Why FoodLens is Different
-            </p>
-            <p className="mt-4 max-w-2xl mx-auto text-xl text-slate-600">
-              We're transforming how India discovers food with AI-powered insights
-            </p>
-          </div>
-
-          <div className="mt-16">
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {features.map((feature, index) => (
-                <div
-                  key={index}
-                  className="bg-white rounded-2xl p-6 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-slate-100"
-                  onMouseEnter={() => setActiveFeature(index)}
-                >
-                  <div className="inline-flex items-center justify-center p-3 bg-orange-100 rounded-xl text-orange-600">
-                    {feature.icon}
-                  </div>
-                  <h3 className="mt-4 text-lg font-bold text-slate-900">{feature.title}</h3>
-                  <p className="mt-2 text-slate-600">{feature.description}</p>
-                </div>
-              ))}
+    {/* Features Grid */}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-12">
+      {features.map((feature, index) => (
+        <div
+          key={index}
+          className="relative group text-center overflow-hidden rounded-2xl bg-white p-10 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] transition-all duration-500 hover:-translate-y-2 border border-slate-100/80"
+        >
+          {/* Animated Background Element */}
+          <div className="absolute inset-0 -z-10 bg-gradient-to-br from-white to-orange-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          
+          {/* Icon Container with Animation - Made much larger */}
+          <div className="relative mb-8 flex justify-center">
+            <div className="flex items-center justify-center h-24 w-24 rounded-3xl bg-gradient-to-br from-orange-500 to-amber-500 text-white shadow-lg transform group-hover:scale-110 transition-transform duration-300">
+              {/* Increased icon size */}
+              {React.cloneElement(feature.icon, { size: 40 })}
             </div>
+            <div className="absolute -inset-6 bg-orange-500/10 rounded-3xl blur-xl group-hover:opacity-75 opacity-0 transition-opacity duration-300 -z-10" />
           </div>
+
+          {/* Title - Made slightly smaller to emphasize icons */}
+          <h3 className="text-lg font-semibold text-slate-900 mb-4">
+            {feature.title}
+          </h3>
+
+          {/* Description - Made minimal and smaller */}
+          <p className="text-slate-600 text-xs leading-relaxed max-w-xs mx-auto">
+            {feature.description}
+          </p>
+
+          {/* Hover Indicator Line */}
+          <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-orange-500 to-amber-500 group-hover:w-full transition-all duration-500" />
         </div>
-      </div>
+      ))}
+    </div>
+
+    {/* Bottom CTA - Simplified */}
+    <div className="mt-20 text-center">
+      <button className="inline-flex items-center rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-8 py-4 text-lg font-medium text-white shadow-sm hover:from-orange-600 hover:to-amber-600 transition-all transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2">
+        Start Exploring
+      </button>
+    </div>
+  </div>
+</div>
 
       {/* CTA Section */}
-      <div className="py-16 bg-gradient-to-r from-orange-600 to-amber-600">
+      {/* <div className="py-16 bg-gradient-to-r from-orange-600 to-amber-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
@@ -321,7 +431,7 @@ const FoodLensLanding = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Footer */}
       <footer className="bg-slate-900 text-slate-300">
@@ -420,7 +530,7 @@ const FoodLensLanding = () => {
       </footer>
 
       {/* Add custom animation styles */}
-      <style jsx>{`
+      {/* <style jsx>{`
         @keyframes blob {
           0% {
             transform: translate(0px, 0px) scale(1);
@@ -444,7 +554,9 @@ const FoodLensLanding = () => {
         .animation-delay-4000 {
           animation-delay: 4s;
         }
-      `}</style>
+      `}</style> */}
+
+
     </div>
   );
 };
