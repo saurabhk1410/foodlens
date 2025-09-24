@@ -441,31 +441,7 @@ const FoodLensLanding = () => {
         </div>
       </div>
 
-      {/* CTA Section */}
-      {/* <div className="py-16 bg-gray-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">
-            Ready to explore?
-          </h2>
-          <p className="text-gray-300 mb-8 text-xl">
-            Discover India's food like never before.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="/signup"
-              className="px-6 py-3 bg-white text-gray-900 font-medium rounded-xl shadow-md hover:bg-gray-100 transition-all"
-            >
-              Get Started
-            </a>
-            <a
-              href="/demo"
-              className="px-6 py-3 bg-transparent border-2 border-white text-white font-medium rounded-xl hover:bg-white/10 transition-all"
-            >
-              Live Demo
-            </a>
-          </div>
-        </div>
-      </div> */}
+    
 
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-300 border-t border-gray-800">
