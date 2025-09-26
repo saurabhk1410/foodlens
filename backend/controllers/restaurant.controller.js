@@ -25,3 +25,17 @@ export const addRestaurant = async (req, res) => {
 };
 
 
+// Get all restaurants
+export const getAllRestaurants = async (_req, res) => {
+  try {
+    const restaurants = await Restaurant.find()
+      .populate("dishes")
+      .populate("reviews");
+
+    res.status(200).json({ restaurants });
+  } catch (error) {
+    console.error("Error fetching restaurants:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+

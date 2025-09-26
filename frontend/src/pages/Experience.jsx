@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star, Camera, MapPin, Clock, Users, Award, ChevronDown, Search, X, Heart, Utensils, Briefcase, PartyPopper, User, Moon, Calendar, Coffee } from 'lucide-react';
+import { useAuthContext } from '../context/AuthContext.jsx';
+import axios from 'axios';
 
 const ExperienceSharingPage = () => {
+  const { authUser } = useAuthContext();
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [selectedOccasions, setSelectedOccasions] = useState([]);
@@ -16,45 +19,66 @@ const ExperienceSharingPage = () => {
     address: '',
     cuisine: '',
   });
+  const [samplePlaces, setSamplePlaces] = useState([]);
 
   // Sample places data - in a real app this would come from an API
-  const samplePlaces = [
-    {
-      id: 1,
-      name: "Sai Palace",
-      type: "North Indian, Chinese, Mughlai",
-      address: "123 Food Street, Culinary Road, Mumbai",
-    },
-    {
-      id: 2,
-      name: "Spice Garden",
-      type: "South Indian, Vegetarian",
-      address: "456 Spice Lane, Bangalore",
-    },
-    {
-      id: 3,
-      name: "Coastal Delights",
-      type: "Seafood, Goan",
-      address: "789 Beach Road, Goa",
-    },
-    {
-      id: 4,
-      name: "Urban Brew",
-      type: "Cafe, Continental",
-      address: "321 Downtown Avenue, Delhi",
-    },
-  ];
+  // const samplePlaces = [
+  //   {
+  //     id: 1,
+  //     name: "Sai Palace",
+  //     type: "North Indian, Chinese, Mughlai",
+  //     address: "123 Food Street, Culinary Road, Mumbai",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Spice Garden",
+  //     type: "South Indian, Vegetarian",
+  //     address: "456 Spice Lane, Bangalore",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Coastal Delights",
+  //     type: "Seafood, Goan",
+  //     address: "789 Beach Road, Goa",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Urban Brew",
+  //     type: "Cafe, Continental",
+  //     address: "321 Downtown Avenue, Delhi",
+  //   },
+  // ];
 
-  const occasions = [
-    { id: 1, name: "Date Night", icon: <Heart size={20} className="text-gray-700" /> },
-    { id: 2, name: "Family Dinner", icon: <Users size={20} className="text-gray-700" /> },
-    { id: 3, name: "Business Meeting", icon: <Briefcase size={20} className="text-gray-700" /> },
-    { id: 4, name: "Friends Hangout", icon: <PartyPopper size={20} className="text-gray-700" /> },
-    { id: 5, name: "Solo Dining", icon: <User size={20} className="text-gray-700" /> },
-    { id: 6, name: "Late Night Bite", icon: <Moon size={20} className="text-gray-700" /> },
-    { id: 7, name: "Celebration", icon: <Award size={20} className="text-gray-700" /> },
-    { id: 8, name: "Casual Lunch", icon: <Coffee size={20} className="text-gray-700" /> },
-  ];
+  // const occasions = [
+  //   { id: 1, name: "Date Night", icon: <Heart size={20} className="text-gray-700" /> },
+  //   { id: 2, name: "Family Dinner", icon: <Users size={20} className="text-gray-700" /> },
+  //   { id: 3, name: "Business Meeting", icon: <Briefcase size={20} className="text-gray-700" /> },
+  //   { id: 4, name: "Friends Hangout", icon: <PartyPopper size={20} className="text-gray-700" /> },
+  //   { id: 5, name: "Solo Dining", icon: <User size={20} className="text-gray-700" /> },
+  //   { id: 6, name: "Late Night Bite", icon: <Moon size={20} className="text-gray-700" /> },
+  //   { id: 7, name: "Celebration", icon: <Award size={20} className="text-gray-700" /> },
+  //   { id: 8, name: "Casual Lunch", icon: <Coffee size={20} className="text-gray-700" /> },
+  // ];
+
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      try {
+        const res = await axios.get('http://localhost:5000/api/restaurants/getAll', {
+          withCredentials: true,
+        });
+        const places = (res?.data?.restaurants || []).map((r) => ({
+          id: r._id,
+          name: r.name,
+          type: `Rating: ${r.rating ?? 0}`,
+          address: r.location || 'Unknown address',
+        }));
+        setSamplePlaces(places);
+      } catch (_) {
+        // silently ignore for now
+      }
+    };
+    fetchRestaurants();
+  }, []);
 
   const rewardTiers = [
     { points: 50, title: "Basic Review", description: "Earn 50 points for sharing your experience" },
@@ -66,11 +90,12 @@ const ExperienceSharingPage = () => {
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
     // In a real app, you would upload these to a server
-    // For demo, we'll just create placeholder previews
+    // For demo, we'll just create placeholder previews, but also keep the File for submit
     const newImages = files.map(file => ({
       id: Math.random(),
       name: file.name,
-      url: URL.createObjectURL(file)
+      url: URL.createObjectURL(file),
+      file,
     }));
     setUploadedImages([...uploadedImages, ...newImages]);
   };
@@ -98,6 +123,44 @@ const ExperienceSharingPage = () => {
     if (review.length > 100) points += 75; // Detailed review
     if (rating > 0 && uploadedImages.length > 0 && review.length > 100) points += 150; // Complete experience bonus
     return points;
+  };
+
+  const handleSubmit = async () => {
+    if (!authUser) {
+      alert('Please log in to submit a review.');
+      return;
+    }
+    if (!selectedPlace) {
+      alert('Please select a restaurant from the list.');
+      return;
+    }
+    if (!rating || review.length < 20) {
+      alert('Please provide a rating and a review of at least 20 characters.');
+      return;
+    }
+    try {
+      const formData = new FormData();
+      formData.append('restaurantId', selectedPlace.id);
+      formData.append('rating', String(rating));
+      formData.append('comment', review);
+      uploadedImages.forEach(img => {
+        if (img.file) formData.append('images', img.file);
+      });
+
+      await axios.post('http://localhost:5000/api/reviews/add', formData, {
+        withCredentials: true,
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      // Reset minimal state after success
+      setRating(0);
+      setHoverRating(0);
+      setReview('');
+      setUploadedImages([]);
+      alert('Review submitted successfully!');
+    } catch (e) {
+      const msg = e?.response?.data?.message || 'Something went wrong while submitting the review.';
+      alert(msg);
+    }
   };
 
   const handleSearch = (e) => {
@@ -288,7 +351,7 @@ const ExperienceSharingPage = () => {
                   )}
                 </div>
                 
-                {!selectedPlace && (
+                {/* {!selectedPlace && (
                   <div className="border-t border-gray-200 pt-4 mt-4">
                     <h4 className="font-medium text-gray-900 mb-3">Add a new place</h4>
                     <div className="space-y-3">
@@ -324,7 +387,7 @@ const ExperienceSharingPage = () => {
                       </div>
                     </div>
                   </div>
-                )}
+                )} */}
               </div>
 
               {/* Rating Section */}
@@ -356,7 +419,7 @@ const ExperienceSharingPage = () => {
               </div>
 
               {/* Occasion Selection */}
-              <div className="mb-8">
+              {/* <div className="mb-8">
                 <h3 className="font-medium text-gray-900 mb-4">What was the occasion? (Select all that apply)</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {occasions.map((occasion) => (
@@ -374,7 +437,7 @@ const ExperienceSharingPage = () => {
                     </button>
                   ))}
                 </div>
-              </div>
+              </div> */}
 
               {/* Review Text */}
               <div className="mb-8">
@@ -453,6 +516,7 @@ const ExperienceSharingPage = () => {
                 <button 
                   className="bg-gray-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                   disabled={!rating || review.length < 20 || (!selectedPlace && !customPlace.name)}
+                  onClick={handleSubmit}
                 >
                   Submit Review
                 </button>
