@@ -17,7 +17,10 @@ const App = () => {
         <Route path="/" element={<FoodLensLanding />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route 
+          path="/profile" 
+          element={authUser? <Profile /> : <Navigate to="/login"/>}
+        />
         <Route path="/restaurant" element={<RestaurantPage />} />
         <Route path="/map" element={<IndiaMapPage />} />
         <Route 
