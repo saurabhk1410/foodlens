@@ -1,51 +1,59 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronRight, Search, Star, MapPin, Users, Camera, TrendingUp, Shield, Brain, PlusCircle, Apple, Play } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
+import { ChevronRight, Search, Star, MapPin, Users, Camera, TrendingUp, Shield, Brain } from 'lucide-react';
+import { useAuthContext } from '../context/AuthContext';
+import axios from 'axios';
 
 const FoodLensLanding = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeFeature, setActiveFeature] = useState(0);
   const [scrollPosition, setScrollPosition] = useState(0);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const navigate = useNavigate();
+  const { setAuthUser } = useAuthContext();
 
   useEffect(() => {
     const handleScroll = () => {
       setScrollPosition(window.scrollY);
     };
 
+    const token = localStorage.getItem("userId");
+    if (token) {
+      setIsLoggedIn(true);
+    }
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleLogout = async () => {
+  try {
+    // Call backend logout API
+    await axios.post(
+      "http://localhost:5000/api/auth/logout",
+      {},
+      { headers: { "Content-Type": "application/json" }, withCredentials: true }
+    );
+
+    // Clear local storage
+    localStorage.removeItem("userId");
+    setIsLoggedIn(false);
+    setIsProfileOpen(false);
+
+    // Navigate to home page
+    navigate("/");
+  } catch (error) {
+    console.error("Logout failed:", error);
+  }
+};
+
   const features = [
-    {
-      icon: <Brain size={24} />,
-      title: "AI-Powered Insights",
-      description: "Get summarized reviews and personalized recommendations based on your preferences."
-    },
-    {
-      icon: <Search size={24} />,
-      title: "Dish-Centric Discovery",
-      description: "Find the best dishes, not just restaurants. Know what to order before you go."
-    },
-    {
-      icon: <Users size={24} />,
-      title: "Community-Driven",
-      description: "Add local food places yourself and earn points for contributions."
-    },
-    {
-      icon: <Shield size={24} />,
-      title: "Trustworthy Reviews",
-      description: "AI-powered fake review detection ensures you get authentic recommendations."
-    },
-    {
-      icon: <Camera size={24} />,
-      title: "Visual Search",
-      description: "Upload food photos to identify dishes and find similar options near you."
-    },
-    {
-      icon: <TrendingUp size={24} />,
-      title: "Trend Forecasting",
-      description: "Discover emerging food trends in your city before they become mainstream."
-    }
+    { icon: <Brain size={24} />, title: "AI-Powered Insights", description: "Get summarized reviews and personalized recommendations based on your preferences." },
+    { icon: <Search size={24} />, title: "Dish-Centric Discovery", description: "Find the best dishes, not just restaurants. Know what to order before you go." },
+    { icon: <Users size={24} />, title: "Community-Driven", description: "Add local food places yourself and earn points for contributions." },
+    { icon: <Shield size={24} />, title: "Trustworthy Reviews", description: "AI-powered fake review detection ensures you get authentic recommendations." },
+    { icon: <Camera size={24} />, title: "Visual Search", description: "Upload food photos to identify dishes and find similar options near you." },
+    { icon: <TrendingUp size={24} />, title: "Trend Forecasting", description: "Discover emerging food trends in your city before they become mainstream." }
   ];
 
   const trendingDishes = [
@@ -59,22 +67,13 @@ const FoodLensLanding = () => {
     <div className="min-h-screen bg-white text-gray-900">
       {/* Navigation */}
       <nav
-        className={`fixed w-full z-50 transition-all duration-300 ${
-          scrollPosition > 50
-            ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200'
-            : 'bg-transparent'
-        }`}
+        className={`fixed w-full z-50 transition-all duration-300 ${scrollPosition > 50 ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200' : 'bg-transparent'}`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center h-20">
-            
             {/* Left: Logo */}
             <div className="flex items-center space-x-2">
-              <img
-                src="https://i.postimg.cc/nLprcQxw/image-1-removebg-preview.png"
-                className="w-12"
-                alt="logo"
-              />
+              <img src="https://i.postimg.cc/nLprcQxw/image-1-removebg-preview.png" className="w-12" alt="logo" />
               <span className="text-2xl font-bold text-black">
                 Food<span className="text-gray-600">Lens</span>
               </span>
@@ -85,11 +84,7 @@ const FoodLensLanding = () => {
               <div className="w-full max-w-xl bg-white rounded-xl border border-gray-300 p-2 flex items-center shadow-sm">
                 <div className="flex-1 flex items-center px-3">
                   <Search size={20} className="text-gray-500" />
-                  <input
-                    type="text"
-                    placeholder="Search for dishes, places, or experiences..."
-                    className="w-full py-3 px-2 text-gray-700 placeholder-gray-500 outline-none bg-transparent"
-                  />
+                  <input type="text" placeholder="Search for dishes, places, or experiences..." className="w-full py-3 px-2 text-gray-700 placeholder-gray-500 outline-none bg-transparent" />
                 </div>
                 <button className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-5 rounded-lg transition-all flex items-center">
                   Search <ChevronRight size={20} className="ml-1" />
@@ -101,56 +96,50 @@ const FoodLensLanding = () => {
             <div className="flex items-center space-x-4">
               {/* Desktop Auth */}
               <div className="hidden md:flex items-center space-x-4">
-                <a
-                  href="/login"
-                  className="text-gray-700 hover:text-black px-3 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  Login
-                </a>
-                <a
-                  href="/signup"
-                  className="px-4 py-2 rounded-md text-sm font-medium text-white bg-black hover:bg-gray-800 transition-all shadow-sm hover:shadow-md"
-                >
-                  Sign Up
-                </a>
+                {!isLoggedIn ? (
+                  <>
+                    <a href="/login" className="text-gray-700 hover:text-black px-3 py-2 rounded-md text-sm font-medium transition-colors">Login</a>
+                    <a href="/signup" className="px-4 py-2 rounded-md text-sm font-medium text-white bg-black hover:bg-gray-800 transition-all shadow-sm hover:shadow-md">Sign Up</a>
+                  </>
+                ) : (
+                  <div className="relative">
+                    <button
+                      onClick={() => setIsProfileOpen(!isProfileOpen)}
+                      className="px-4 py-2 rounded-md text-sm font-medium text-white bg-black hover:bg-gray-800 transition-all shadow-sm hover:shadow-md"
+                    >
+                      Profile
+                    </button>
+                    {isProfileOpen && (
+                      <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg py-2 border border-gray-200">
+                        <a
+                          href="/profile"
+                          className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        >
+                          View Profile
+                        </a>
+                        <button
+                          onClick={handleLogout}
+                          className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        >
+                          Logout
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Mobile Menu Button */}
               <div className="md:hidden">
-                <button
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-black focus:outline-none"
-                >
+                <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-black focus:outline-none">
                   <span className="sr-only">Open main menu</span>
                   {!isMenuOpen ? (
-                    <svg
-                      className="block h-6 w-6"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 6h16M4 12h16M4 18h16"
-                      />
+                    <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                   ) : (
-                    <svg
-                      className="block h-6 w-6"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
+                    <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   )}
                 </button>
@@ -163,45 +152,33 @@ const FoodLensLanding = () => {
         {isMenuOpen && (
           <div className="md:hidden bg-white/95 backdrop-blur-md rounded-b-xl shadow-xl border-b border-gray-200">
             <div className="pt-2 pb-3 space-y-1">
-              <a
-                href="/discover"
-                className="block pl-3 pr-4 py-2 border-l-4 border-black text-base font-medium text-black bg-gray-50"
-              >
-                Discover
-              </a>
-              <a
-                href="/trending"
-                className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-black hover:bg-gray-50"
-              >
-                Trending
-              </a>
-              <a
-                href="/categories"
-                className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-black hover:bg-gray-50"
-              >
-                Categories
-              </a>
-              <a
-                href="/addplace"
-                className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-black hover:bg-gray-50"
-              >
-                Add Place
-              </a>
+              <a href="/discover" className="block pl-3 pr-4 py-2 border-l-4 border-black text-base font-medium text-black bg-gray-50">Discover</a>
+              <a href="/trending" className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-black hover:bg-gray-50">Trending</a>
+              <a href="/categories" className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-black hover:bg-gray-50">Categories</a>
+              <a href="/addplace" className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:text-black hover:bg-gray-50">Add Place</a>
+
               <div className="pt-4 pb-3 border-t border-gray-200">
-                <div className="flex items-center px-5">
-                  <a
-                    href="/login"
-                    className="block px-4 py-2 rounded-md text-base font-medium text-gray-600 hover:text-black"
-                  >
-                    Login
-                  </a>
-                  <a
-                    href="/signup"
-                    className="ml-3 px-4 py-2 rounded-md text-base font-medium text-white bg-black hover:bg-gray-800"
-                  >
-                    Sign Up
-                  </a>
-                </div>
+                {!isLoggedIn ? (
+                  <div className="flex items-center px-5 space-x-3">
+                    <a href="/login" className="block px-4 py-2 rounded-md text-base font-medium text-gray-600 hover:text-black">Login</a>
+                    <a href="/signup" className="px-4 py-2 rounded-md text-base font-medium text-white bg-black hover:bg-gray-800">Sign Up</a>
+                  </div>
+                ) : (
+                  <div className="px-5 space-y-1">
+                    <a
+                      href="/profile"
+                      className="block px-4 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100"
+                    >
+                      View Profile
+                    </a>
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-gray-100"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -299,52 +276,52 @@ const FoodLensLanding = () => {
         </div>
       </div>
 
-    {/* Features Section */}
-<div className="py-16 bg-gray-50">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    {/* Section Heading */}
-    <div className="text-center mb-16">
-      <h2 className="text-3xl font-bold text-gray-900 mb-4">
-        Smarter Food Discovery
-      </h2>
-      <p className="text-gray-600 max-w-2xl mx-auto">
-        Our AI-powered platform helps you find exactly what you're craving with precision and ease
-      </p>
-    </div>
-
-    {/* Features Grid */}
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {features.map((feature, index) => (
-        <div
-          key={index}
-          className="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 text-center"
-        >
-          {/* Icon Container */}
-          <div className="flex items-center justify-center h-20 w-20 mx-auto rounded-full bg-white text-black mb-6">
-            {React.cloneElement(feature.icon, { size: 60, fill: "white" })}
+      {/* Features Section */}
+      <div className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Heading */}
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Smarter Food Discovery
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Our AI-powered platform helps you find exactly what you're craving with precision and ease
+            </p>
           </div>
 
-          {/* Title */}
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">
-            {feature.title}
-          </h3>
+          {/* Features Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 text-center"
+              >
+                {/* Icon Container */}
+                <div className="flex items-center justify-center h-20 w-20 mx-auto rounded-full bg-white text-black mb-6">
+                  {React.cloneElement(feature.icon, { size: 60, fill: "white" })}
+                </div>
 
-          {/* Description */}
-          <p className="text-gray-600">
-            {feature.description}
-          </p>
+                {/* Title */}
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                  {feature.title}
+                </h3>
+
+                {/* Description */}
+                <p className="text-gray-600">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Bottom CTA */}
+          <div className="mt-16 text-center">
+            <button className="bg-black text-white px-8 py-4 rounded-xl font-medium hover:bg-gray-800 transition-all shadow-md">
+              Start Exploring
+            </button>
+          </div>
         </div>
-      ))}
-    </div>
-
-    {/* Bottom CTA */}
-    <div className="mt-16 text-center">
-      <button className="bg-black text-white px-8 py-4 rounded-xl font-medium hover:bg-gray-800 transition-all shadow-md">
-        Start Exploring
-      </button>
-    </div>
-  </div>
-</div>
+      </div>
 
       {/* Recommended For You Section */}
       <div className="py-16 bg-white">
@@ -441,7 +418,7 @@ const FoodLensLanding = () => {
         </div>
       </div>
 
-    
+
 
       {/* Footer */}
       <footer className="bg-gray-900 text-gray-300 border-t border-gray-800">
@@ -450,7 +427,7 @@ const FoodLensLanding = () => {
             <div className="mt-12 md:mt-0 rounded-3xl">
               <img src="https://i.postimg.cc/Znd63ZzC/pngtree-clink-glasses-to-celebrate-beer-cheers-oktoberfest-png-image-8377065-removebg-preview.png" className='w-56' alt="" />
             </div>
-            
+
             <div className="mt-12 grid grid-cols-2 gap-8 xl:mt-0 xl:col-span-2">
               <div className="md:grid md:grid-cols-2 md:gap-8">
                 <div>
