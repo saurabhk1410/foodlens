@@ -7,30 +7,15 @@ const dishSchema = new mongoose.Schema(
       ref: "Restaurant",
       required: true,
     },
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    cost: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
-    category: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    cuisine: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+    name: { type: String, required: true },
+    cost: { type: Number, required: true },
+    category: { type: String },
+    type: { type: String }, // veg/non-veg etc.
+    cuisine: { type: String },
+    rating: { type: Number, default: 0 },
+    legacy_id: { type: String, index: true, unique: false }
   },
   { timestamps: true }
 );
 
 export const Dish = mongoose.model("Dish", dishSchema);
-
-

@@ -149,7 +149,7 @@ const Profile = () => {
                 onClick={() => setActiveTab("reviews")}
               >
                 <FaUtensils className="inline-block mr-2" />
-                Reviews ({user.reviews.length})
+                Reviews ({(user.reviews && user.reviews.length) || 0})
               </button>
               <button
                 className={`flex-1 py-4 px-6 text-center font-medium transition-colors duration-200 ${
@@ -170,7 +170,7 @@ const Profile = () => {
             {activeTab === "reviews" ? (
               <div>
                 <h3 className="text-xl font-bold mb-6">Your Restaurant Reviews</h3>
-                {user.reviews.length === 0 ? (
+                {(user.reviews && user.reviews.length) === 0 ? (
                   <div className="text-center py-12">
                     <FaUtensils className="text-6xl text-gray-300 mx-auto mb-4" />
                     <p className="text-gray-500 text-lg mb-4">You haven't written any reviews yet</p>
@@ -180,7 +180,7 @@ const Profile = () => {
                   </div>
                 ) : (
                   <div className="grid gap-6">
-                    {user.reviews.map((review) => (
+                    {(user.reviews || []).map((review) => (
                       <div
                         key={review._id}
                         className="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow duration-200"
@@ -204,9 +204,9 @@ const Profile = () => {
                           <p className="text-gray-700 mb-4 leading-relaxed">{review.comment}</p>
                         )}
 
-                        {review.images.length > 0 && (
+                        {Array.isArray(review.images) && review.images.length > 0 && (
                           <div className="flex gap-3 overflow-x-auto pb-2">
-                            {review.images.map((img, idx) => (
+                            {(review.images || []).map((img, idx) => (
                               <img
                                 key={idx}
                                 src={img}

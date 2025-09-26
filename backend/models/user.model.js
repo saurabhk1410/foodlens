@@ -2,38 +2,16 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-    },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    password: {
-      type: String,
-      required: true,
-      minlength: 6,
-    },
-    gender: {
-      type: String,
-      enum: ["male", "female"],
-    },
-    profilePic: {
-      type: String,
-      default: "",
-    },
-    points: {
-      type: Number,
-      default: 0,
-    },
-    reviews: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Review",
-      },
-    ],
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    location: { type: String },
+    rating_count: { type: Number, default: 0 },
+    preferred_cuisines: [{ type: String }], // store as array
+    favourite_dishes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Dish" }],
+    legacy_id: { type: String, index: true, unique: false },
+    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
+    points: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
