@@ -5,7 +5,7 @@ import sendCookie from '../utils/sendCookie.js';
 // Signing Up the User
 export const signup = async (req, res) => {  
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, gender } = req.body;
     let user = await User.findOne({ email });
     if (user) 
     {
@@ -15,7 +15,7 @@ export const signup = async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    user = new User({ name, email, password: hashedPassword });
+    user = new User({ name, email, password: hashedPassword, gender });
     if (user) {
       await user.save();
     //   sendCookie(user._id, res);
@@ -23,6 +23,7 @@ export const signup = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        gender: user.gender,
       });
     } else {
       res.status(400).json({ error: "Invalid user data" });

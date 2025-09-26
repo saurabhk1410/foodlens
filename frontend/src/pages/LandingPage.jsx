@@ -39,7 +39,7 @@ const FoodLensLanding = () => {
     localStorage.removeItem("userId");
     setIsLoggedIn(false);
     setIsProfileOpen(false);
-
+    setAuthUser(null);
     // Navigate to home page
     navigate("/");
   } catch (error) {
