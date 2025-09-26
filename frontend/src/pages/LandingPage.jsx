@@ -57,10 +57,10 @@ const FoodLensLanding = () => {
   ];
 
   const trendingDishes = [
-    { name: "Masala Dosa", place: "Vidyarthi Bhavan", price: "₹90", rating: 4.8, reviews: 128, link: "https://images.pexels.com/photos/12392915/pexels-photo-12392915.jpeg" },
-    { name: "Chole Bhature", place: "Sita Ram Diwan Chand", price: "₹120", rating: 4.7, reviews: 96, link: "https://images.pexels.com/photos/11818239/pexels-photo-11818239.jpeg" },
-    { name: "Pani Puri", place: "Shree Balaji", price: "₹50", rating: 4.9, reviews: 215, link: "https://images.pexels.com/photos/13041629/pexels-photo-13041629.jpeg" },
-    { name: "Biryani", place: "Cafe Bahar", price: "₹180", rating: 4.6, reviews: 182, link: "https://images.pexels.com/photos/4224304/pexels-photo-4224304.jpeg" }
+    { name: "Masala Dosa", place: "Vidyarthi Bhavan", price: "₹90", rating: 4.8, reviews: 128, link: "../../public/dosa.png" },
+    { name: "Chole Bhature", place: "Sita Ram Diwan Chand", price: "₹120", rating: 4.7, reviews: 96, link:  "../../public/cholebahture.png" },
+    { name: "Pani Puri", place: "Shree Balaji", price: "₹50", rating: 4.9, reviews: 215, link:  "../../public/panipuri.png"},
+    { name: "Biryani", place: "Cafe Bahar", price: "₹180", rating: 4.6, reviews: 182, link:  "../../public/biryani.png"}
   ];
 
   return (
@@ -186,7 +186,7 @@ const FoodLensLanding = () => {
       </nav>
 
       {/* Hero Section */}
-      <div className="bg-[url('https://i.postimg.cc/d1h2sJhh/image-4.png')] rounded-4xl bg-center bg-cover h-screen pt-28 mx-8">
+      <div className="bg-[url('../../public/home.png')] rounded-4xl bg-center bg-cover h-screen pt-28 mx-8">
         <div className="h-full flex items-center justify-center bg-black/40 rounded-4xl">
           <div className="text-center px-4 max-w-3xl">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
