@@ -9,8 +9,11 @@ from functions.search import hierarchical_search_ids
 from functions.embeddings_updates import update_embeddings_from_json
 from functions.user_personalize import recommend_homepage, create_user_embedding
 from functions.dish_recognition import classify_dish, search_restaurants_by_dish
-
+from functions.reviews import summarize_reviews
 app = FastAPI()
+
+class ReviewRequest(BaseModel):
+    restaurant_id: int
 
 class UserPreferences(BaseModel):
     user_id: int
@@ -120,6 +123,8 @@ def get_homepage_recommendations(request: UserEmbeddingRequest):
     
 #     return result
 
+
+
 @app.post("/search_dish_image")
 async def search_dish_image(file: UploadFile = File(...)):
     image_bytes = await file.read()
@@ -132,3 +137,11 @@ async def search_dish_image(file: UploadFile = File(...)):
     search_results = search_restaurants_by_dish(dish_label)
     
     return {"dish_detected": dish_label, "restaurants": search_results}
+
+@app.post("/summarize")
+async def summarize(request: ReviewRequest):
+    try:
+        result = summarize_reviews(request.restaurant_id)
+        return {"restaurant_id": request.restaurant_id, "summary": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
