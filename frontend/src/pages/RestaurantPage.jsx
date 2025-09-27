@@ -4,6 +4,11 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
 const RestaurantPage = () => {
+
+
+
+
+
   const { id } = useParams();
   const [restaurant, setRestaurant] = useState(null);
   const [userExperiences, setUserExperiences] = useState([]);
@@ -22,10 +27,10 @@ const RestaurantPage = () => {
           address: `${data.location}, ${data.city}`,
           openingHours: data.timing,
           phone: "+91 98765 43210", // fallback if not in API
-          website: "#", // fallback
-          priceRange: `₹₹₹ (Approx ${data.price_for_two} for two)`,
+          website: "", // fallback
+          priceRange: ` (Approx Rs.${data.price_for_two} for two)`,
           description: "Authentic flavors with a great ambiance", // optional, can fetch from API if available
-          images: data.dishes.slice(0, 4).map(d => `https://picsum.photos/seed/${d._id}/600/400`) // placeholder images
+          images: data.dishes.slice(0, 4).map(d => "https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D") // placeholder images
         });
 
         // Map dishes to user experiences for now as mock
@@ -107,16 +112,16 @@ const RestaurantPage = () => {
             alt="Restaurant interior"
             className="w-full h-full object-cover"
           />
-
+{/* 
           <button onClick={prevImage} className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-all">
             <ChevronLeft size={24} />
           </button>
 
           <button onClick={nextImage} className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-all">
             <ChevronRight size={24} />
-          </button>
+          </button> */}
 
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+          {/* <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
             {restaurant.images.map((_, index) => (
               <button
                 key={index}
@@ -124,7 +129,7 @@ const RestaurantPage = () => {
                 onClick={() => setActiveImageIndex(index)}
               />
             ))}
-          </div>
+          </div> */}
         </div>
 
         {/* Restaurant Details */}
@@ -141,10 +146,10 @@ const RestaurantPage = () => {
                 <Phone size={20} className="text-gray-600 mr-3" />
                 <span className="text-gray-700">{restaurant.phone}</span>
               </div>
-              <div className="flex items-center">
+              {/* <div className="flex items-center">
                 <Globe size={20} className="text-gray-600 mr-3" />
                 <a href={restaurant.website} className="text-blue-600 hover:underline">{restaurant.website}</a>
-              </div>
+              </div> */}
               <div className="flex items-center">
                 <Clock size={20} className="text-gray-600 mr-3" />
                 <span className="text-gray-700">Open today: {restaurant.openingHours}</span>
@@ -235,31 +240,49 @@ const RestaurantPage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Highlights */}
-            <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                What Customers Love
-              </h3>
-              <ul className="space-y-3">
-                {[
-                  { aspect: "Butter Chicken", mentions: 189, sentiment: "98% positive" },
-                  { aspect: "Biryani", mentions: 167, sentiment: "94% positive" },
-                  { aspect: "Service Staff", mentions: 142, sentiment: "91% positive" },
-                  { aspect: "Ambiance", mentions: 125, sentiment: "89% positive" },
-                  { aspect: "Paneer Tikka", mentions: 98, sentiment: "92% positive" }
-                ].map((item, index) => (
-                  <li key={index} className="flex justify-between items-center pb-3 border-b border-gray-200 last:border-b-0 last:pb-0">
-                    <div>
-                      <div className="font-medium text-gray-900">{item.aspect}</div>
-                      <div className="text-xs text-gray-500">{item.mentions} mentions</div>
-                    </div>
-                    <span className="text-sm font-medium text-green-600">{item.sentiment}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          {/* Highlights */}
+<div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    What Customers Love
+  </h3>
+  <ul className="space-y-3">
+    {[
+      { aspect: "Butter Chicken", mentions: 189 },
+      { aspect: "Biryani", mentions: 167 },
+      { aspect: "Service Staff", mentions: 142 },
+      { aspect: "Ambiance", mentions: 125 },
+      { aspect: "Paneer Tikka", mentions: 98 }
+    ].map((item, index) => {
+      const rating = Math.floor(Math.random() * 3) + 3; // random 3–5 stars
+
+      return (
+        <li
+          key={index}
+          className="flex justify-between items-center pb-3 border-b border-gray-200 last:border-b-0 last:pb-0"
+        >
+          <div>
+            <div className="font-medium text-gray-900">{item.aspect}</div>
+            {/* <div className="text-xs text-gray-500">{item.mentions} mentions</div> */}
+          </div>
+          <div className="flex items-center space-x-1">
+            {[...Array(5)].map((_, i) => (
+              <Star
+                key={i}
+                size={16}
+                className={i < rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}
+              />
+            ))}
+            <span className="text-sm font-medium text-gray-600">{rating}/5</span>
+          </div>
+        </li>
+      );
+    })}
+  </ul>
+</div>
+
 
             {/* Areas for Improvement */}
             <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
@@ -280,9 +303,9 @@ const RestaurantPage = () => {
                   <li key={index} className="flex justify-between items-center pb-3 border-b border-gray-200 last:border-b-0 last:pb-0">
                     <div>
                       <div className="font-medium text-gray-900">{item.aspect}</div>
-                      <div className="text-xs text-gray-500">{item.mentions} mentions</div>
+                      {/* <div className="text-xs text-gray-500">{item.mentions} mentions</div> */}
                     </div>
-                    <span className="text-sm font-medium text-blue-600">{item.sentiment}</span>
+                    {/* <span className="text-sm font-medium text-blue-600">{item.sentiment}</span> */}
                   </li>
                 ))}
               </ul>
@@ -329,20 +352,20 @@ const RestaurantPage = () => {
                 <h4 className="font-bold text-lg mb-2">{experience.reviewTitle}</h4>
                 <p className="text-gray-700 mb-4">{experience.review}</p>
 
-                <div className="rounded-lg overflow-hidden h-48 mb-4">
-                  <img
+                <div className="rounded-lg overflow-hidden  mb-4">
+                  {/* <img
                     src={experience.reviewImage}
                     alt="Dining experience"
                     className="w-full h-full object-cover"
-                  />
+                  /> */}
                 </div>
 
                 <div className="flex items-center justify-between text-sm text-gray-500">
                   <div className="flex items-center">
-                    <Users size={16} className="mr-1" />
-                    <span>Group of 4</span>
+                    {/* <Users size={16} className="mr-1" /> */}
+                    {/* <span>Group of 4</span> */}
                   </div>
-                  <span>Dinner</span>
+                  {/* <span>Dinner</span> */}
                 </div>
               </div>
             ))}
