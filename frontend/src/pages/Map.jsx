@@ -8,6 +8,8 @@ const IndiaMapPage = () => {
   const [mapLoaded, setMapLoaded] = useState(false);
   const mapRef = useRef(null);
   const markersRef = useRef([]);
+    const navigate = useNavigate();
+
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
