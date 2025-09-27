@@ -1,0 +1,21 @@
+# Ignore Python virtual environment
+.venv/
+venv/
+ENV/
+env/
+
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+
+# Ignore datasets
+dataset_new/
+food_images/
+
+
+# But keep the functions folder and its contents
+functions/food_images
+functions/__pycache__
+dish_count.py
+map.py
+
