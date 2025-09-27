@@ -17,7 +17,7 @@ const IndiaMapPage = () => {
         distance: "1.2 km",
         price: "₹₹₹",
         image: "https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg",
-        coordinates: [19.0760, 72.8777] // Mumbai
+        coordinates: [25.6125, 85.1283] // Mumbai
       },
       {
         id: 2,
