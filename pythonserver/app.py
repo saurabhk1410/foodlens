@@ -8,7 +8,7 @@ import io
 from functions.search import hierarchical_search_ids
 from functions.embeddings_updates import update_embeddings_from_json
 from functions.user_personalize import recommend_homepage, create_user_embedding
-from functions.dish_recognition import classify_dish
+from functions.dish_recognition import classify_dish, search_restaurants_by_dish
 
 app = FastAPI()
 
@@ -110,12 +110,25 @@ def get_homepage_recommendations(request: UserEmbeddingRequest):
         "top_restaurant_ids": restaurant_ids
     }
 
-@app.post("/classify_dish")
-async def classify_dish_api(file: UploadFile = File(...)):
-    # Read uploaded file
+# @app.post("/classify_dish")
+# async def classify_dish_api(file: UploadFile = File(...)):
+#     # Read uploaded file
+#     image_bytes = await file.read()
+    
+#     # Call classifier
+#     result = classify_dish(image_bytes)
+    
+#     return result
+
+@app.post("/search_dish_image")
+async def search_dish_image(file: UploadFile = File(...)):
     image_bytes = await file.read()
     
-    # Call classifier
-    result = classify_dish(image_bytes)
+    # Classify the dish
+    result = classify_dish(image_bytes)  # your existing function
+    dish_label = result['dish_detected']
     
-    return result
+    # Search restaurants
+    search_results = search_restaurants_by_dish(dish_label)
+    
+    return {"dish_detected": dish_label, "restaurants": search_results}

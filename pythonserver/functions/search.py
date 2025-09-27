@@ -7,24 +7,27 @@ import os
 
 
 BASE_DIR = os.path.dirname(__file__)  # directory of function_search.py
-EMBED_DIR = os.path.join(BASE_DIR, "embeddings")  # embeddings folder path
+EMBED_DIR = os.path.join(BASE_DIR, "new_embeddings")  # embeddings folder path
 
-restaurant_index = faiss.read_index(os.path.join(EMBED_DIR, "restaurant_index.faiss"))
-dish_index = faiss.read_index(os.path.join(EMBED_DIR, "dish_index.faiss"))
-review_index = faiss.read_index(os.path.join(EMBED_DIR, "review_index.faiss"))
+restaurant_index = faiss.read_index(os.path.join(EMBED_DIR, "restaurant_index1.faiss"))
+dish_index = faiss.read_index(os.path.join(EMBED_DIR, "dish_index1.faiss"))
+review_index = faiss.read_index(os.path.join(EMBED_DIR, "review_index1.faiss"))
 
 # Load metadata
-with open(os.path.join(EMBED_DIR, "restaurant_meta.pkl"), "rb") as f:
+with open(os.path.join(EMBED_DIR, "restaurant_meta1.pkl"), "rb") as f:
     restaurant_meta = pickle.load(f)
 
-with open(os.path.join(EMBED_DIR, "dish_meta.pkl"), "rb") as f:
+with open(os.path.join(EMBED_DIR, "dish_meta1.pkl"), "rb") as f:
     dish_meta = pickle.load(f)
 
-with open(os.path.join(EMBED_DIR, "review_meta.pkl"), "rb") as f:
+with open(os.path.join(EMBED_DIR, "review_meta1.pkl"), "rb") as f:
     review_meta = pickle.load(f)
 
+with open(os.path.join(EMBED_DIR, "db_id_to_faiss_idx.pkl"), "rb") as f:
+    db_id_to_faiss_idx = pickle.load(f)
+
 # Load sentence transformer model
-model = SentenceTransformer('all-MiniLM-L6-v2')
+model = SentenceTransformer('all-mpnet-base-v2') 
 
 # Locations & Cuisines
 locations = ["Andheri","Bandra","Borivali","Malad","Lower Parel","Kandivali",
@@ -61,7 +64,14 @@ def hierarchical_search_ids(query: str, top_k: int = 5):
 
     # Semantic search on restaurant embeddings
     query_vec = model.encode([query]).astype('float32')[0]
-    restaurant_vectors = np.array([restaurant_index.reconstruct(idx) for idx in filtered_rest_ids])
+    restaurant_vectors = np.array([
+        restaurant_index.reconstruct(db_id_to_faiss_idx[rid])
+        for rid in filtered_rest_ids
+        if rid in db_id_to_faiss_idx  # safety check
+    ])
+    if len(restaurant_vectors) == 0:
+        return {"query": query, "results": []}
+
 
     sim_scores = [
         (idx, np.dot(query_vec, vec) / (np.linalg.norm(query_vec) * np.linalg.norm(vec)))

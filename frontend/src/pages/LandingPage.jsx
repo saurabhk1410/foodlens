@@ -83,8 +83,8 @@ const FoodLensLanding = () => {
       // If image is uploaded, search by image
       navigate("/map", { state: { imageSearch: true, imageUrl: selectedImage } });
     } else {
-      // Regular text search
-      navigate("/map", { state: { searchQuery } });
+      // In FoodLensLanding
+      navigate(`/map?search=${encodeURIComponent(searchQuery)}`);
     }
   };
 
