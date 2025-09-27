@@ -140,7 +140,7 @@ export const getRestaurantById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    // Find restaurant by ID and populate dishes and reviews if needed
+    // Fetch restaurant from Mongo
     const restaurant = await Restaurant.findById(id)
       .populate("dishes")
       .populate("reviews");
@@ -149,7 +149,25 @@ export const getRestaurantById = async (req, res) => {
       return res.status(404).json({ message: "Restaurant not found" });
     }
 
-    res.status(200).json(restaurant);
+    let summaryData = null;
+
+    try {
+      // Call Flask API using legacy_id (important: Flask expects "restaurant_id" as param)
+      const pythonResponse = await axios.post("http://127.0.0.1:8000/summarize", {
+        restaurant_id: Number(restaurant.legacy_id)
+      });
+
+      summaryData = pythonResponse.data.summary;
+    } catch (err) {
+      console.error("Error calling Flask summarization API:", err.message);
+      // Fallback if Flask API is down
+      summaryData = { error: "AI summary unavailable" };
+    }
+
+    res.status(200).json({
+      ...restaurant.toObject(),
+      ai_summary: summaryData   // attach insights here
+    });
   } catch (error) {
     console.error("Error fetching restaurant:", error);
     res.status(500).json({ message: "Server error" });
