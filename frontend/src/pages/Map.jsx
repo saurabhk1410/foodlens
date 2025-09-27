@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const IndiaMapPage = () => {
   const [restaurants, setRestaurants] = useState([]);
@@ -141,8 +142,12 @@ const IndiaMapPage = () => {
           <h1 className="text-2xl font-bold mb-4">Restaurants</h1>
           <div className="space-y-6">
             {restaurants.map(r => (
-              <div key={r.id} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all cursor-pointer">
+              <div 
+                key={r.id} 
+                className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all cursor-pointer"
+                onClick={() => navigate(`/restaurant/${r.id}`)}>
                 <div className="flex">
+                  {/* <h1>{r.id}</h1> */}
                   <img src={r.image} alt={r.name} className="w-24 h-24 object-cover rounded-lg" />
                   <div className="ml-4 flex-1">
                     <h3 className="font-bold text-lg">{r.name}</h3>

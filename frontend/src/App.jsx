@@ -21,7 +21,7 @@ const App = () => {
           path="/profile" 
           element={authUser? <Profile /> : <Navigate to="/login"/>}
         />
-        <Route path="/restaurant" element={<RestaurantPage />} />
+        <Route path="/restaurant/:id" element={<RestaurantPage />} />
         <Route path="/map" element={<IndiaMapPage />} />
         <Route 
           path="/experience" 
