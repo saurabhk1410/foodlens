@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import { ChevronRight, Search, Star, MapPin, Users, Camera, TrendingUp, Shield, Brain } from 'lucide-react';
 import { useAuthContext } from '../context/AuthContext';
+
 import axios from 'axios';
 
 const FoodLensLanding = () => {
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -86,7 +88,7 @@ const FoodLensLanding = () => {
                   <Search size={20} className="text-gray-500" />
                   <input type="text" placeholder="Search for dishes, places, or experiences..." className="w-full py-3 px-2 text-gray-700 placeholder-gray-500 outline-none bg-transparent" />
                 </div>
-                <button className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-5 rounded-lg transition-all flex items-center">
+                <button onClick={()=>{navigate("/map")}} className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-5 rounded-lg transition-all flex items-center">
                   Search <ChevronRight size={20} className="ml-1" />
                 </button>
               </div>
