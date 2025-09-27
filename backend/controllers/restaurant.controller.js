@@ -134,3 +134,24 @@ export const searchRestaurants = async (req, res) => {
     });
   }
 };
+
+// Get restaurant by ID
+export const getRestaurantById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Find restaurant by ID and populate dishes and reviews if needed
+    const restaurant = await Restaurant.findById(id)
+      .populate("dishes")
+      .populate("reviews");
+
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    res.status(200).json(restaurant);
+  } catch (error) {
+    console.error("Error fetching restaurant:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
