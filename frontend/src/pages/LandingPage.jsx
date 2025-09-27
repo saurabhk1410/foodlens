@@ -11,6 +11,7 @@ const FoodLensLanding = () => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const { setAuthUser } = useAuthContext();
 
@@ -86,9 +87,29 @@ const FoodLensLanding = () => {
               <div className="w-full max-w-xl bg-white rounded-xl border border-gray-300 p-2 flex items-center shadow-sm">
                 <div className="flex-1 flex items-center px-3">
                   <Search size={20} className="text-gray-500" />
-                  <input type="text" placeholder="Search for dishes, places, or experiences..." className="w-full py-3 px-2 text-gray-700 placeholder-gray-500 outline-none bg-transparent" />
+                  <input 
+                    type="text" 
+                    placeholder="Search for dishes, places, or experiences..." 
+                    className="w-full py-3 px-2 text-gray-700 placeholder-gray-500 outline-none bg-transparent" 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        navigate(`/map?search=${encodeURIComponent(searchQuery)}`);
+                      }
+                    }}
+                  />
                 </div>
-                <button onClick={()=>{navigate("/map")}} className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-5 rounded-lg transition-all flex items-center">
+                <button 
+                  onClick={() => {
+                    if (searchQuery.trim()) {
+                      navigate(`/map?search=${encodeURIComponent(searchQuery)}`);
+                    } else {
+                      navigate("/map");
+                    }
+                  }} 
+                  className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-5 rounded-lg transition-all flex items-center"
+                >
                   Search <ChevronRight size={20} className="ml-1" />
                 </button>
               </div>
