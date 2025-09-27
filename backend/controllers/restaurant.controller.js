@@ -1,4 +1,7 @@
 import { Restaurant } from "../models/restaurant.model.js";
+import { Dish } from "../models/dish.model.js";
+import { Review } from "../models/review.model.js";
+import axios from "axios";
 
 // Add a new restaurant (no auth required as requested)
 export const addRestaurant = async (req, res) => {
@@ -39,3 +42,95 @@ export const getAllRestaurants = async (_req, res) => {
   }
 };
 
+// Search restaurants using AI/ML server
+export const searchRestaurants = async (req, res) => {
+  try {
+    const { query } = req.body;
+
+    if (!query || query.trim() === "") {
+      return res.status(400).json({ message: "Search query is required" });
+    }
+
+    // Call Python server search API
+    const pythonServerResponse = await axios.post("http://127.0.0.1:8000/search", {
+      query: query.trim()
+    });
+
+    const searchResults = pythonServerResponse.data;
+
+    if (!searchResults.results || searchResults.results.length === 0) {
+      return res.status(200).json({
+        query: searchResults.query,
+        results: [],
+        message: "No results found"
+      });
+    }
+
+    // Fetch detailed data for each result
+    const detailedResults = await Promise.all(
+      searchResults.results.map(async (result) => {
+        // Find restaurant by legacy_id
+        const restaurant = await Restaurant.findOne({ legacy_id: result.restaurant_id.toString() })
+          .populate("reviews"); // keep restaurant-level reviews, not dishes
+
+        if (!restaurant) return null;
+
+        // Fetch only the dishes Python backend asked for
+        const dishIds = result.dishes.map(d => d.dish_id.toString());
+        const dishes = await Dish.find({ legacy_id: { $in: dishIds } });
+
+        // Attach reviews to each dish if needed
+        const dishesWithReviews = await Promise.all(
+          result.dishes.map(async (dishResult) => {
+            const dish = dishes.find(d => d.legacy_id === dishResult.dish_id.toString());
+            if (!dish) return null;
+
+            const reviews = dishResult.review_ids.length > 0
+              ? await Review.find({ legacy_id: { $in: dishResult.review_ids.map(id => id.toString()) } })
+              : [];
+
+            return {
+              ...dish.toObject(),
+              reviews
+            };
+          })
+        );
+
+        // Fetch restaurant-level reviews
+        const restaurantReviews = result.restaurant_reviews.length > 0
+          ? await Review.find({ legacy_id: { $in: result.restaurant_reviews.map(id => id.toString()) } })
+          : [];
+
+        return {
+          restaurant: restaurant.toObject(),
+          dishes: dishesWithReviews.filter(dish => dish !== null),
+          restaurantReviews
+        };
+      })
+    );
+
+    // Filter out null results
+    const validResults = detailedResults.filter(result => result !== null);
+
+    res.status(200).json({
+      query: searchResults.query,
+      results: validResults
+    });
+
+  } catch (error) {
+    console.error("Error in search:", error.message);
+
+    // Handle Python server connection errors
+    if (error.code === 'ECONNREFUSED') {
+      return res.status(503).json({
+        message: "Search service is temporarily unavailable",
+        error: "Python server not running"
+      });
+    }
+
+    res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message
+    });
+  }
+};
