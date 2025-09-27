@@ -6,6 +6,7 @@ const IndiaMapPage = () => {
   const [restaurants, setRestaurants] = useState([]);
   const [mapLoaded, setMapLoaded] = useState(false);
   const mapRef = useRef(null);
+  const markersRef = useRef([]);
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -18,9 +19,11 @@ const IndiaMapPage = () => {
         const response = await axios.post('http://localhost:5000/api/restaurants/search', {
           query: searchQuery
         });
-        // Map the backend response to only the fields we want
+        
         const formatted = response.data.results.map(item => {
           const restaurant = item.restaurant;
+          console.log('Restaurant coordinates:', restaurant.name, restaurant.latitude, restaurant.longitude);
+          
           return {
             id: restaurant._id,
             name: restaurant.name,
@@ -28,9 +31,13 @@ const IndiaMapPage = () => {
             rating: restaurant.rating,
             reviewsCount: restaurant.reviews.length,
             recommendedDish: item.dishes[0]?.name || 'Chef Special',
-            image: 'https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg' // Hardcoded image
+            image: 'https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg',
+            latitude: parseFloat(restaurant.latitude),
+            longitude: parseFloat(restaurant.longitude)
           };
         });
+        
+        console.log('Formatted restaurants:', formatted);
         setRestaurants(formatted);
       } catch (error) {
         console.error('Error fetching restaurants:', error);
@@ -40,7 +47,7 @@ const IndiaMapPage = () => {
     fetchRestaurants();
   }, [searchQuery]);
 
-  // Initialize map
+  // Initialize map - only run when mapLoaded changes
   useEffect(() => {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
@@ -51,19 +58,39 @@ const IndiaMapPage = () => {
     script.src = 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.js';
     script.onload = () => {
       setMapLoaded(true);
-      initMap();
     };
     document.body.appendChild(script);
 
     return () => {
       document.head.removeChild(link);
       document.body.removeChild(script);
+      // Clean up map
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
     };
-  }, [restaurants]);
+  }, []);
+
+  // Initialize map and markers when both map is loaded and restaurants are available
+  useEffect(() => {
+    if (mapLoaded && restaurants.length > 0) {
+      initMap();
+    }
+  }, [mapLoaded, restaurants]);
 
   const initMap = () => {
-    if (typeof L === 'undefined' || mapRef.current) return;
+    // Clean up existing map
+    if (mapRef.current) {
+      mapRef.current.remove();
+      mapRef.current = null;
+    }
 
+    // Clean up existing markers
+    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current = [];
+
+    // Create new map
     const map = L.map('map-container').setView([20.5937, 78.9629], 5);
     mapRef.current = map;
 
@@ -73,19 +100,37 @@ const IndiaMapPage = () => {
 
     // Add markers
     restaurants.forEach(r => {
-      const marker = L.marker([r.latitude || 19.0760, r.longitude || 72.8777]).addTo(map);
-      marker.bindPopup(`
-        <div class="p-2">
-          <h3 class="font-bold">${r.name}</h3>
-          <p class="text-sm">${r.cuisine}</p>
-          <div class="flex items-center mt-1">
-            <span class="text-amber-500">★</span>
-            <span class="ml-1 text-sm">${r.rating}</span>
+      // Validate coordinates
+      if (r.latitude && r.longitude && 
+          !isNaN(r.latitude) && !isNaN(r.longitude) &&
+          Math.abs(r.latitude) <= 90 && Math.abs(r.longitude) <= 180) {
+        
+        console.log('Adding marker for:', r.name, 'at:', r.latitude, r.longitude);
+        
+        const marker = L.marker([r.latitude, r.longitude]).addTo(map);
+        marker.bindPopup(`
+          <div class="p-2">
+            <h3 class="font-bold">${r.name}</h3>
+            <p class="text-sm">${r.cuisine}</p>
+            <div class="flex items-center mt-1">
+              <span class="text-amber-500">★</span>
+              <span class="ml-1 text-sm">${r.rating}</span>
+            </div>
+            <p class="text-sm mt-1">Recommended: ${r.recommendedDish}</p>
           </div>
-          <p class="text-sm mt-1">Recommended: ${r.recommendedDish}</p>
-        </div>
-      `);
+        `);
+        
+        markersRef.current.push(marker);
+      } else {
+        console.warn('Invalid coordinates for restaurant:', r.name, r.latitude, r.longitude);
+      }
     });
+
+    // Fit map to show all markers if we have valid markers
+    if (markersRef.current.length > 0) {
+      const group = new L.featureGroup(markersRef.current);
+      map.fitBounds(group.getBounds().pad(0.1));
+    }
   };
 
   return (
@@ -108,6 +153,9 @@ const IndiaMapPage = () => {
                       <span>{r.reviewsCount} reviews</span>
                     </div>
                     <p className="text-gray-600 mt-1 text-sm">Recommended: {r.recommendedDish}</p>
+                    <p className="text-gray-400 text-xs mt-1">
+                      Coordinates: {r.latitude?.toFixed(4)}, {r.longitude?.toFixed(4)}
+                    </p>
                   </div>
                 </div>
               </div>
