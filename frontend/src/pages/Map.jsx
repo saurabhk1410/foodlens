@@ -8,13 +8,34 @@ const IndiaMapPage = () => {
   const [mapLoaded, setMapLoaded] = useState(false);
   const mapRef = useRef(null);
   const markersRef = useRef([]);
-    const navigate = useNavigate();
-
-
+  const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const searchQuery = queryParams.get('search') || '';
+  const imageSearchData = location.state?.imageSearch;
+  const imageResults = location.state?.imageResults;
 
+
+  useEffect(() => {
+    if (imageSearchData && imageResults) {
+      // Map backend response to your frontend format
+      const formatted = imageResults.map(item => ({
+        id: item.id,
+        name: item.name,
+        cuisine: item.cuisine,
+        rating: item.rating,
+        reviewsCount: item.reviewsCount,
+        recommendedDish: item.recommendedDish,
+        image: 'https://images.pexels.com/photos/260922/pexels-photo-260922.jpeg', // placeholder
+        latitude: parseFloat(item.latitude),
+        longitude: parseFloat(item.longitude),
+      }));
+      setRestaurants(formatted);
+    } else {
+      // fallback to query search
+      fetchRestaurants();
+    }
+  }, [imageSearchData, imageResults]);
   // Fetch restaurants from backend
   useEffect(() => {
     const fetchRestaurants = async () => {
@@ -22,11 +43,11 @@ const IndiaMapPage = () => {
         const response = await axios.post('http://localhost:5000/api/restaurants/search', {
           query: searchQuery
         });
-        
+
         const formatted = response.data.results.map(item => {
           const restaurant = item.restaurant;
           console.log('Restaurant coordinates:', restaurant.name, restaurant.latitude, restaurant.longitude);
-          
+
           return {
             id: restaurant._id,
             name: restaurant.name,
@@ -39,7 +60,7 @@ const IndiaMapPage = () => {
             longitude: parseFloat(restaurant.longitude)
           };
         });
-        
+
         console.log('Formatted restaurants:', formatted);
         setRestaurants(formatted);
       } catch (error) {
@@ -104,12 +125,12 @@ const IndiaMapPage = () => {
     // Add markers
     restaurants.forEach(r => {
       // Validate coordinates
-      if (r.latitude && r.longitude && 
-          !isNaN(r.latitude) && !isNaN(r.longitude) &&
-          Math.abs(r.latitude) <= 90 && Math.abs(r.longitude) <= 180) {
-        
+      if (r.latitude && r.longitude &&
+        !isNaN(r.latitude) && !isNaN(r.longitude) &&
+        Math.abs(r.latitude) <= 90 && Math.abs(r.longitude) <= 180) {
+
         console.log('Adding marker for:', r.name, 'at:', r.latitude, r.longitude);
-        
+
         const marker = L.marker([r.latitude, r.longitude]).addTo(map);
         marker.bindPopup(`
           <div class="p-2">
@@ -122,7 +143,7 @@ const IndiaMapPage = () => {
             <p class="text-sm mt-1">Recommended: ${r.recommendedDish}</p>
           </div>
         `);
-        
+
         markersRef.current.push(marker);
       } else {
         console.warn('Invalid coordinates for restaurant:', r.name, r.latitude, r.longitude);
@@ -144,8 +165,8 @@ const IndiaMapPage = () => {
           <h1 className="text-2xl font-bold mb-4">Restaurants</h1>
           <div className="space-y-6">
             {restaurants.map(r => (
-              <div 
-                key={r.id} 
+              <div
+                key={r.id}
                 className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all cursor-pointer"
                 onClick={() => navigate(`/restaurant/${r.id}`)}>
                 <div className="flex">

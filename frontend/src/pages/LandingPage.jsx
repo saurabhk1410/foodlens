@@ -17,7 +17,9 @@ const FoodLensLanding = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showUploadOption, setShowUploadOption] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
+  // Store the actual File object, not just the URL
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const [selectedImagePreview, setSelectedImagePreview] = useState(null); // For image preview URL
   const [imageReviews, setImageReviews] = useState([]);
   const navigate = useNavigate();
   const { setAuthUser } = useAuthContext();
@@ -38,19 +40,15 @@ const FoodLensLanding = () => {
 
   const handleLogout = async () => {
     try {
-      // Call backend logout API
       await axios.post(
         "http://localhost:5000/api/auth/logout",
         {},
         { headers: { "Content-Type": "application/json" }, withCredentials: true }
       );
-
-      // Clear local storage
       localStorage.removeItem("userId");
       setIsLoggedIn(false);
       setIsProfileOpen(false);
       setAuthUser(null);
-      // Navigate to home page
       navigate("/");
     } catch (error) {
       console.error("Logout failed:", error);
@@ -60,30 +58,52 @@ const FoodLensLanding = () => {
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      setSelectedImage(URL.createObjectURL(file));
+      setUploadedFile(file); // Store the actual file
+      setSelectedImagePreview(URL.createObjectURL(file)); // Store URL for preview
       setShowUploadOption(false);
+      // Removed mock reviews as they are not needed for backend interaction
+    }
+  };
 
-      // Simulate fetching reviews for the uploaded image
-      const mockReviews = [
-        { id: 1, user: "Food Explorer", rating: 4, comment: "This looks delicious! Where was this taken?", date: "2 days ago" },
-        { id: 2, user: "Chef Master", rating: 5, comment: "Amazing presentation! The colors are vibrant.", date: "1 week ago" },
-        { id: 3, user: "Food Blogger", rating: 4, comment: "I've been here! The portion size is generous.", date: "3 days ago" }
-      ];
-      setImageReviews(mockReviews);
+  const handleImageSubmit = async () => {
+    if (!uploadedFile) { // Check for the actual file
+      console.warn("No image file selected for submission.");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("file", uploadedFile); // Append the actual file
+
+      const response = await axios.post(
+        "http://localhost:5000/api/restaurants/searchByImage",
+        formData,
+        // IMPORTANT: Remove the manual Content-Type header when sending FormData
+        // Axios will automatically set it correctly.
+        // { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      console.log("Image search results:", response.data);
+
+      // Navigate to map page with results
+      navigate("/map", { state: { imageSearch: true, imageResults: response.data.results } });
+
+    } catch (error) {
+      console.error("Error submitting image:", error);
+      // You might want to display an error message to the user
     }
   };
 
   const handleRemoveImage = () => {
-    setSelectedImage(null);
-    setImageReviews([]);
+    setUploadedFile(null);
+    setSelectedImagePreview(null);
+    setImageReviews([]); // Clear reviews as well
   };
 
   const handleSearch = () => {
-    if (selectedImage) {
-      // If image is uploaded, search by image
-      navigate("/map", { state: { imageSearch: true, imageUrl: selectedImage } });
-    } else {
-      // In FoodLensLanding
+    if (uploadedFile) { // If an image is uploaded, trigger image search submit
+      handleImageSubmit(); // This will navigate if successful
+    } else if (searchQuery.trim() !== '') {
       navigate(`/map?search=${encodeURIComponent(searchQuery)}`);
     }
   };
@@ -111,11 +131,11 @@ const FoodLensLanding = () => {
                   <Search size={20} className="text-gray-500" />
 
                   {/* Image Preview in Search Bar */}
-                  {selectedImage ? (
+                  {selectedImagePreview ? (
                     <div className="flex items-center ml-8 space-x-3 flex-1">
                       <div className="relative">
                         <img
-                          src={selectedImage}
+                          src={selectedImagePreview} // Use selectedImagePreview here
                           alt="Uploaded preview"
                           className="w-10 h-10 object-cover rounded-lg border border-gray-300"
                         />
@@ -136,7 +156,7 @@ const FoodLensLanding = () => {
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyPress={(e) => {
                         if (e.key === 'Enter') {
-                          navigate(`/map?search=${encodeURIComponent(searchQuery)}`);
+                          handleSearch(); // Use the unified search handler
                         }
                       }}
                     />
@@ -156,6 +176,7 @@ const FoodLensLanding = () => {
                         <label className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
                           Upload Image
                           <input
+                            id="image-upload-input"
                             type="file"
                             accept="image/*"
                             className="hidden"
@@ -165,6 +186,15 @@ const FoodLensLanding = () => {
                       </div>
                     )}
                   </div>
+                  {uploadedFile && ( // Show submit button if a file is ready
+                    <button
+                      onClick={handleImageSubmit}
+                      className="ml-4 bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-all"
+                    >
+                      Submit Image
+                    </button>
+                  )}
+
                 </div>
                 <button onClick={handleSearch} className="bg-black hover:bg-gray-800 text-white font-medium py-2 px-5 rounded-lg transition-all flex items-center">
                   Search <ChevronRight size={20} className="ml-1" />
@@ -225,11 +255,7 @@ const FoodLensLanding = () => {
                         </div>
                       )}
                     </div>
-
-
-
                   </div>
-
                 )}
               </div>
 
@@ -284,35 +310,6 @@ const FoodLensLanding = () => {
           </div>
         )}
       </nav>
-
-      {/* Reviews Section (only shown when image is uploaded) */}
-      {/* {selectedImage && imageReviews.length > 0 && (
-        <div className="pt-24 px-4 max-w-4xl mx-auto">
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-2xl font-bold mb-4">Image Analysis & Reviews</h2>
-            <div className="space-y-3">
-              {imageReviews.map((review) => (
-                <div key={review.id} className="border-b pb-3 last:border-b-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-medium">{review.user}</span>
-                    <div className="flex items-center">
-                      {[...Array(5)].map((_, i) => (
-                        <Star 
-                          key={i} 
-                          size={14} 
-                          className={i < review.rating ? "text-yellow-400 fill-current" : "text-gray-300"} 
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-600">{review.comment}</p>
-                  <span className="text-xs text-gray-400">{review.date}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )} */}
 
       <Hero />
       <TrendingDishes />

@@ -2,6 +2,9 @@ import { Restaurant } from "../models/restaurant.model.js";
 import { Dish } from "../models/dish.model.js";
 import { Review } from "../models/review.model.js";
 import axios from "axios";
+import FormData from "form-data";
+import fs from "fs";
+import path from "path";
 
 // Add a new restaurant (no auth required as requested)
 export const addRestaurant = async (req, res) => {
@@ -170,6 +173,45 @@ export const getRestaurantById = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching restaurant:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const searchByImage = async (req, res) => {
+  try {
+    const file = req.file; // Assuming you use multer
+    if (!file) return res.status(400).json({ message: "No image uploaded" });
+
+    const formData = new FormData();
+    formData.append("file", fs.createReadStream(file.path));
+
+    // Call your FastAPI
+    const response = await axios.post("http://127.0.0.1:8000/search_dish_image", formData, {
+      headers: formData.getHeaders(),
+    });
+
+    const results = await Promise.all(
+      response.data.restaurants.results.map(async (item) => {
+        // Fetch real restaurant by legacy_id
+        const restaurant = await Restaurant.findOne({ legacy_id: item.restaurant_id });
+        if (!restaurant) return null;
+
+        return {
+          id: restaurant._id,
+          name: restaurant.name,
+          cuisine: restaurant.cuisine_category.join(", "),
+          rating: restaurant.rating,
+          reviewsCount: restaurant.reviews.length,
+          recommendedDish: item.dishes[0]?.dish_id || "Chef Special",
+          latitude: restaurant.latitude,
+          longitude: restaurant.longitude,
+        };
+      })
+    );
+
+    res.json({ dish_detected: response.data.dish_detected, results: results.filter(r => r !== null) });
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
