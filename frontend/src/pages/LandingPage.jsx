@@ -62,7 +62,7 @@ const FoodLensLanding = () => {
     if (file) {
       setSelectedImage(URL.createObjectURL(file));
       setShowUploadOption(false);
-      
+
       // Simulate fetching reviews for the uploaded image
       const mockReviews = [
         { id: 1, user: "Food Explorer", rating: 4, comment: "This looks delicious! Where was this taken?", date: "2 days ago" },
@@ -109,17 +109,17 @@ const FoodLensLanding = () => {
               <div className="w-full max-w-xl bg-white rounded-xl border border-gray-300 p-2 flex items-center shadow-sm">
                 <div className="flex-1 flex items-center px-3">
                   <Search size={20} className="text-gray-500" />
-                  
+
                   {/* Image Preview in Search Bar */}
                   {selectedImage ? (
                     <div className="flex items-center ml-8 space-x-3 flex-1">
                       <div className="relative">
-                        <img 
-                          src={selectedImage} 
-                          alt="Uploaded preview" 
+                        <img
+                          src={selectedImage}
+                          alt="Uploaded preview"
                           className="w-10 h-10 object-cover rounded-lg border border-gray-300"
                         />
-                        <button 
+                        <button
                           onClick={handleRemoveImage}
                           className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
                         >
@@ -128,31 +128,37 @@ const FoodLensLanding = () => {
                       </div>
                     </div>
                   ) : (
-                    <input 
-                      type="text" 
-                      placeholder="Search for dishes, places, or experiences..." 
-                      className="w-full py-3 px-2 text-gray-700 placeholder-gray-500 outline-none bg-transparent" 
+                    <input
+                      type="text"
+                      placeholder="Search for dishes, places, or experiences..."
+                      className="w-full py-3 px-2 text-gray-700 placeholder-gray-500 outline-none bg-transparent"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          navigate(`/map?search=${encodeURIComponent(searchQuery)}`);
+                        }
+                      }}
                     />
+
                   )}
-                  
+
                   <div className="relative">
-                    <button 
+                    <button
                       onClick={() => setShowUploadOption(!showUploadOption)}
                       className="p-2 text-gray-500 hover:text-black transition-colors"
                     >
                       <Upload size={20} />
                     </button>
-                    
+
                     {showUploadOption && (
                       <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
                         <label className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
                           Upload Image
-                          <input 
-                            type="file" 
-                            accept="image/*" 
-                            className="hidden" 
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
                             onChange={handleImageUpload}
                           />
                         </label>
@@ -176,53 +182,53 @@ const FoodLensLanding = () => {
                     <a href="/signup" className="px-4 py-2 rounded-md text-sm font-medium text-white bg-black hover:bg-gray-800 transition-all shadow-sm hover:shadow-md">Sign Up</a>
                   </>
                 ) : (
-                 <div className="relative flex items-center gap-3">
+                  <div className="relative flex items-center gap-3">
 
                     {/* Add Button */}
-<button onClick={() => navigate('/experience')}
-  className="inline-flex items-center gap-2 px-4 py-4 bg-white text-black font-medium rounded-full border border-black hover:bg-black hover:text-white transition-all shadow-sm hover:shadow-md"
->
-  <MapPinPlusInside size={24} className="transition-colors" />
-  Add Experience
-</button>
+                    <button onClick={() => navigate('/experience')}
+                      className="inline-flex items-center gap-2 px-4 py-4 bg-white text-black font-medium rounded-full border border-black hover:bg-black hover:text-white transition-all shadow-sm hover:shadow-md"
+                    >
+                      <MapPinPlusInside size={24} className="transition-colors" />
+                      Add Experience
+                    </button>
 
 
-  {/* Profile Button */}
-  <div className="relative">
-    <button
-      onClick={() => setIsProfileOpen(!isProfileOpen)}
-      className="flex justify-center items-center h-16 w-16 rounded-full p-1 bg-black/50 hover:bg-gray-800 transition-all shadow-sm hover:shadow-md"
-    >
-      <div className="rounded-full overflow-hidden w-full h-full bg-white">
-        <img
-          src="https://randomuser.me/api/portraits/men/78.jpg"
-          alt="Profile"
-          className="w-full h-full object-cover rounded-full"
-        />
-      </div>
-    </button>
+                    {/* Profile Button */}
+                    <div className="relative">
+                      <button
+                        onClick={() => setIsProfileOpen(!isProfileOpen)}
+                        className="flex justify-center items-center h-16 w-16 rounded-full p-1 bg-black/50 hover:bg-gray-800 transition-all shadow-sm hover:shadow-md"
+                      >
+                        <div className="rounded-full overflow-hidden w-full h-full bg-white">
+                          <img
+                            src="https://randomuser.me/api/portraits/men/78.jpg"
+                            alt="Profile"
+                            className="w-full h-full object-cover rounded-full"
+                          />
+                        </div>
+                      </button>
 
-    {isProfileOpen && (
-      <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg py-2 border border-gray-200">
-        <a
-          href="/profile"
-          className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-        >
-          View Profile
-        </a>
-        <button
-          onClick={handleLogout}
-          className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-        >
-          Logout
-        </button>
-      </div>
-    )}
-  </div>
+                      {isProfileOpen && (
+                        <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg py-2 border border-gray-200">
+                          <a
+                            href="/profile"
+                            className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                          >
+                            View Profile
+                          </a>
+                          <button
+                            onClick={handleLogout}
+                            className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                          >
+                            Logout
+                          </button>
+                        </div>
+                      )}
+                    </div>
 
 
 
-</div>
+                  </div>
 
                 )}
               </div>
