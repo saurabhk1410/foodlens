@@ -2,14 +2,20 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
-import { FaStar, FaUserCircle, FaUtensils, FaEdit, FaMapMarkerAlt, FaCalendarAlt, FaCrown } from "react-icons/fa";
+import { FaStar, FaUserCircle, FaUtensils, FaEdit, FaMapMarkerAlt, FaCalendarAlt, FaCrown, FaCheck, FaTimes } from "react-icons/fa";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("reviews");
+  const [isEditingPreferences, setIsEditingPreferences] = useState(false);
+  const [selectedCuisines, setSelectedCuisines] = useState([]);
+  const [selectedDietType, setSelectedDietType] = useState("");
   const { authUser } = useAuthContext();
   const navigate = useNavigate();
+
+  const cuisines = ["North Indian", "Chinese", "South Indian", "Biryani", "Fast Food", "Desserts", "Italian", "American", "Continental", "Mughlai"];
+  const dietTypes = ["veg", "non veg", "vegan", "jain"];
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -23,6 +29,11 @@ const Profile = () => {
           withCredentials: true,
         });
         setUser(res.data.user);
+        // Initialize preferences from user data
+        if (res.data.user.preferences) {
+          setSelectedCuisines(res.data.user.preferences.cuisines || []);
+          setSelectedDietType(res.data.user.preferences.dietType || "");
+        }
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch profile");
       }
@@ -30,6 +41,37 @@ const Profile = () => {
 
     fetchProfile();
   }, [authUser, navigate]);
+
+  const handleSavePreferences = async () => {
+    try {
+      const res = await axios.put(
+        `http://localhost:5000/api/user/profile/${authUser._id}/preferences`,
+        {
+          preferences: {
+            cuisines: selectedCuisines,
+            dietType: selectedDietType
+          }
+        },
+        { withCredentials: true }
+      );
+      setUser(res.data.user);
+      setIsEditingPreferences(false);
+    } catch (err) {
+      setError("Failed to update preferences");
+    }
+  };
+
+  const toggleCuisine = (cuisine) => {
+    if (selectedCuisines.includes(cuisine)) {
+      setSelectedCuisines(selectedCuisines.filter(c => c !== cuisine));
+    } else {
+      setSelectedCuisines([...selectedCuisines, cuisine]);
+    }
+  };
+
+  const handleDietTypeSelect = (dietType) => {
+    setSelectedDietType(dietType);
+  };
 
   if (error) {
     return (
@@ -133,6 +175,107 @@ const Profile = () => {
                 <span>{userLevel.level}</span>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Preferences Section */}
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
+          <div className="p-6 md:p-8">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold">Your Food Preferences</h3>
+              {!isEditingPreferences ? (
+                <button 
+                  onClick={() => setIsEditingPreferences(true)}
+                  className="bg-black text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-800 transition-colors duration-200 flex items-center gap-2"
+                >
+                  <FaEdit className="text-sm" />
+                  Edit Preferences
+                </button>
+              ) : (
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => setIsEditingPreferences(false)}
+                    className="bg-gray-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-600 transition-colors duration-200 flex items-center gap-2"
+                  >
+                    <FaTimes className="text-sm" />
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={handleSavePreferences}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors duration-200 flex items-center gap-2"
+                  >
+                    <FaCheck className="text-sm" />
+                    Save
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Diet Type */}
+            <div className="mb-8">
+              <h4 className="font-semibold mb-4 text-gray-700">Diet Type</h4>
+              <div className="flex flex-wrap gap-3">
+                {dietTypes.map((diet) => (
+                  <button
+                    key={diet}
+                    onClick={() => isEditingPreferences && handleDietTypeSelect(diet)}
+                    className={`px-6 py-3 rounded-full font-medium transition-all duration-200 ${
+                      selectedDietType === diet
+                        ? "bg-black text-white shadow-lg scale-105"
+                        : isEditingPreferences
+                        ? "bg-gray-100 text-gray-700 hover:bg-gray-200 cursor-pointer"
+                        : "bg-gray-50 text-gray-500 cursor-default"
+                    }`}
+                    disabled={!isEditingPreferences}
+                  >
+                    {diet.charAt(0).toUpperCase() + diet.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Favorite Cuisines */}
+            <div>
+              <h4 className="font-semibold mb-4 text-gray-700">Favorite Cuisines</h4>
+              <div className="flex flex-wrap gap-3">
+                {cuisines.map((cuisine) => (
+                  <button
+                    key={cuisine}
+                    onClick={() => isEditingPreferences && toggleCuisine(cuisine)}
+                    className={`px-6 py-3 rounded-full font-medium transition-all duration-200 ${
+                      selectedCuisines.includes(cuisine)
+                        ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg scale-105"
+                        : isEditingPreferences
+                        ? "bg-gray-100 text-gray-700 hover:bg-gray-200 cursor-pointer"
+                        : "bg-gray-50 text-gray-500 cursor-default"
+                    }`}
+                    disabled={!isEditingPreferences}
+                  >
+                    {cuisine}
+                    {selectedCuisines.includes(cuisine) && (
+                      <FaCheck className="inline-block ml-2 text-sm" />
+                    )}
+                  </button>
+                ))}
+              </div>
+              {isEditingPreferences && (
+                <p className="text-sm text-gray-500 mt-3">
+                  Select your favorite cuisines. You can choose multiple options.
+                </p>
+              )}
+            </div>
+
+            {/* Display Current Preferences when not editing */}
+            {!isEditingPreferences && (
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                <p className="text-gray-700">
+                  <strong>Diet:</strong> {selectedDietType ? selectedDietType.charAt(0).toUpperCase() + selectedDietType.slice(1) : "Not set"}
+                </p>
+                <p className="text-gray-700 mt-2">
+                  <strong>Favorite Cuisines:</strong> {selectedCuisines.length > 0 ? selectedCuisines.join(", ") : "Not set"}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
