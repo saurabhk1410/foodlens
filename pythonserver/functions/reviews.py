@@ -14,7 +14,7 @@ df = pd.read_csv(DATA_PATH)
 
 # OpenAI client
 client = openai.OpenAI(
-    api_key="sk-v1-1ae57a278b5bb6968a039c66992cc6392a214db7c265afdf5d29c4f758e1cba9",   # use env var ideally
+    api_key="",   # use env var ideally
     base_url="https://go.fastrouter.ai/api/v1"
 )
 
